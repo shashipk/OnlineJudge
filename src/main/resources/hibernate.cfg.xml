@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="connection.url">jdbc:oracle:thin:@//localhost:1521/xe</property>
+        <property name="connection.driver_class">oracle.jdbc.OracleDriver</property>
+        <property name="hibernate.connection.username">joamit</property>
+        <property name="hibernate.connection.password">password</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
+        <property name="hibernate.default_schema">JOAMIT</property>
+
+        <property name="show_sql">false</property>
+        <property name="current_session_context_class">thread</property>
+        <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+        <property name="cache.use_query_cache">false</property>
+        <property name="cache.use_second_level_cache">false</property>
+        <property name="bytecode.use_reflection_optimizer">false</property>
+
+        <mapping resource="JudgeCategoriesEntity.hbm.xml"/>
+        <mapping resource="JudgeProblemsEntity.hbm.xml"/>
+        <mapping resource="JudgeSubcategoriesEntity.hbm.xml"/>
+        <mapping resource="JudgeTestCasesEntity.hbm.xml"/>
+        <mapping resource="JudgeUsersEntity.hbm.xml"/>
+    </session-factory>
+</hibernate-configuration>
