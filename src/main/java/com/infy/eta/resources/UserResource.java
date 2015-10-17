@@ -2,11 +2,8 @@ package com.infy.eta.resources;
 
 import com.infy.eta.databeans.JudgeUsersEntity;
 import com.infy.eta.utils.DoInTransaction;
-import com.infy.eta.utils.HibernateUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
-import org.hibernate.Transaction;
-import org.hibernate.classic.Session;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.json.JSONObject;
@@ -23,8 +20,8 @@ import javax.ws.rs.core.Response;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
-import java.time.DateTimeException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -33,15 +30,15 @@ import java.util.List;
 @Path("/user")
 public class UserResource {
 
-	private Logger logger = Logger.getLogger(UserResource.class);
+	private final Logger logger = Logger.getLogger(UserResource.class);
 
 	@POST
 	@Path("/login")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response login(@FormParam("username") String username, @FormParam("password") String password) {
-		logger.info("Received login info for user "+ username);
-		Response response;
+		logger.info("Received login info for user " + username);
+		HashMap<String, Object> map = new HashMap<>();
 		try {
 			//convert password into a MD5 hash
 			String hashedPassword = createHashedPassword(password);
@@ -54,44 +51,67 @@ public class UserResource {
 					return criteria.list();
 				}
 			}.execute();
-			if(list.size() == 1 && list.get(0).getUsername().equalsIgnoreCase(username)){
+			if (list.size() == 1 && list.get(0).getUsername().equalsIgnoreCase(username)) {
 				logger.info("login successful" + list.get(0).getUsername());
-				JSONObject jsonObject = new JSONObject(list.get(0));
-				jsonObject.append("success","true");
-				logger.info(jsonObject.toString());
-				response = Response.ok(jsonObject.toString())
-				                   .header("Access-Control-Allow-Origin", "*")
-				                   .header("Access-Control-Allow-Headers", "Content-Type")
-				                   .header("Access-Control-Allow-Methods", "POST, OPTIONS")
-				                   .build();
+				map.put("success", true);
+				map.put("object", list);
 			} else {
 				logger.info("login failed");
-				response = Response.ok(new JSONObject("{success: false}").toString())
-				                   .header("Access-Control-Allow-Origin", "*")
-				                   .header("Access-Control-Allow-Headers", "Content-Type")
-				                   .header("Access-Control-Allow-Methods", "POST, OPTIONS")
-				                   .build();
+				map.put("success", false);
+				map.put("error", "LOGIN FAILED, BAD USERNAME OR PASSWORD");
 			}
-		} catch(Exception e){
-			logger.error("Exception occurred while checking login credentials. Exception message is "+ e.getMessage(), e);
-			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-			                   .header("Access-Control-Allow-Headers", "Content-Type")
-			                   .header("Access-Control-Allow-Methods", "POST, OPTIONS")
-			                   .header("Access-Control-Allow-Origin", "*")
-			                   .build();
+		} catch (Exception e) {
+			logger.error("Exception occurred while checking login credentials. Exception message is " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while checking login credentials. Exception message is " + e.getMessage());
 		}
-		return response;
+		return getResponse(new JSONObject(map));
 	}
 
+	private String createHashedPassword(String password) {
+		logger.info("About to create MD5 hash of given password.");
+		String passwordHash;
+		try {
+			// Create MessageDigest instance for MD5
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			//Add password bytes to digest
+			md.update(password.getBytes());
+			//Get the hash's bytes
+			byte[] bytes = md.digest();
+			//This bytes[] has bytes in decimal format;
+			//Convert it to hexadecimal format
+			StringBuilder sb = new StringBuilder();
+			for (byte aByte : bytes) {
+				sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
+			}
+			//Get complete hashed password in hex format
+			passwordHash = sb.toString();
+			logger.info("Hash created.");
+		} catch (NoSuchAlgorithmException e) {
+			logger.error("Exception occured while creating hash for password. Exception Message " + e.getMessage(), e);
+			throw new RuntimeException("Could not create hash of the password.");
+		}
+		return passwordHash;
+	}
+
+	private Response getResponse(JSONObject jsonObject) {
+		Response response;
+		response = Response.ok(jsonObject.toString())
+		                   .header("Access-Control-Allow-Headers", "Content-Type")
+		                   .header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		                   .header("Access-Control-Allow-Origin", "*")
+		                   .build();
+		return response;
+	}
 
 	@POST
 	@Path("/add")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response add(@FormParam("username") String username, @FormParam("password") String password
-	                   ,@FormParam("firstName") String firstName, @FormParam("lastName") String lastName) {
-		logger.info("Received login info for user "+ username);
-		Response response;
+			, @FormParam("firstName") String firstName, @FormParam("lastName") String lastName) {
+		logger.info("Received request to add the user with username " + username);
+		HashMap<String, Object> map = new HashMap<>();
 		try {
 			//convert password into a MD5 hash
 			String hashedPassword = createHashedPassword(password);
@@ -104,35 +124,33 @@ public class UserResource {
 					usersEntity.setFirstName(firstName);
 					usersEntity.setLastName(lastName);
 					usersEntity.setInZ(new Timestamp(new Date().getTime()));
-					DateTime outZ = new DateTime(2099,1,1,12,00);
+					DateTime outZ = new DateTime(2099, 1, 1, 12, 00);
 					usersEntity.setOutZ(new Timestamp(outZ.getMillis()));
 					session.save(usersEntity);
 					return usersEntity;
 				}
 			}.execute();
-			response = Response.ok(new JSONObject("{success: true}").toString())
-			                   .header("Access-Control-Allow-Headers", "Content-Type")
-			                   .header("Access-Control-Allow-Methods", "POST, OPTIONS")
-			                   .header("Access-Control-Allow-Origin", "*")
-			                   .build();
-		} catch(Exception e){
-			logger.error("Exception occured while checking login credentials. Exception message is "+ e.getMessage(), e);
-			response = Response.ok(new JSONObject("{success: false}").toString())
-			                   .header("Access-Control-Allow-Headers", "Content-Type")
-			                   .header("Access-Control-Allow-Methods", "POST, OPTIONS")
-			                   .header("Access-Control-Allow-Origin", "*")
-			                   .build();
+			if (usersEntity != null && usersEntity.getId() != null) {
+				map.put("success", true);
+				map.put("object", usersEntity);
+			} else {
+				map.put("success", false);
+				map.put("error", "COULD NOT SAVE USER DETAILS. PLEASE TRY AGAIN");
+			}
+		} catch (Exception e) {
+			logger.error("Exception occurred while trying to add user. Exception message is " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while trying to add user. Exception message is " + e.getMessage());
 		}
-		return response;
+		return getResponse(new JSONObject(map));
 	}
-
 
 	@GET
 	@Path("/get")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllUsers(){
+	public Response getAllUsers() {
 		logger.info("Received request to get all users");
-		Response response;
+		HashMap<String, Object> map = new HashMap<>();
 		try {
 			List<JudgeUsersEntity> list = new DoInTransaction<List<JudgeUsersEntity>>() {
 				@Override
@@ -140,28 +158,27 @@ public class UserResource {
 					return session.createCriteria(JudgeUsersEntity.class).list();
 				}
 			}.execute();
-			response = Response.ok(list)
-			                   .header("Access-Control-Allow-Headers", "Content-Type")
-			                   .header("Access-Control-Allow-Methods", "GET, OPTIONS")
-			                   .header("Access-Control-Allow-Origin", "*")
-			                   .build();
-		} catch(Exception e){
-			logger.error("Exception occured while checking login credentials. Exception message is "+ e.getMessage(), e);
-			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-			                   .header("Access-Control-Allow-Headers", "Content-Type")
-			                   .header("Access-Control-Allow-Methods", "GET, OPTIONS")
-			                   .header("Access-Control-Allow-Origin", "*")
-			                   .build();
+			if (!list.isEmpty()) {
+				map.put("success", true);
+				map.put("object", list);
+			} else {
+				map.put("success", false);
+				map.put("error", "NO USERS FOUND");
+			}
+		} catch (Exception e) {
+			logger.error("Exception occurred while fetching all users. Exception message is " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while fetching all registered users. Exception message is " + e.getMessage());
 		}
-		return response;
+		return getResponse(new JSONObject(map));
 	}
 
 	@GET
 	@Path("/get/{username}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllUserByUsername(@PathParam("username") String username){
-		logger.info("Received request to get all users");
-		Response response;
+	public Response getUserData(@PathParam("username") String username) {
+		logger.info("Received request to get user data for " + username);
+		HashMap<String, Object> map = new HashMap<>();
 		try {
 			List<JudgeUsersEntity> list = new DoInTransaction<List<JudgeUsersEntity>>() {
 				@Override
@@ -169,46 +186,19 @@ public class UserResource {
 					return session.createCriteria(JudgeUsersEntity.class).add(Restrictions.eq("username", username.toUpperCase())).list();
 				}
 			}.execute();
-			response = Response.ok(list)
-			                   .header("Access-Control-Allow-Origin","*")
-			                   .build();
-		} catch(Exception e){
-			logger.error("Exception occured while checking login credentials. Exception message is "+ e.getMessage(), e);
-			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-			                   .header("Access-Control-Allow-Origin","*")
-			                   .build();
-		}
-		return response;
-	}
-
-
-	private String createHashedPassword(String password){
-		logger.info("About to create MD5 hash of given password.");
-		String passwordHash = "";
-		try {
-			// Create MessageDigest instance for MD5
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			//Add password bytes to digest
-			md.update(password.getBytes());
-			//Get the hash's bytes
-			byte[] bytes = md.digest();
-			//This bytes[] has bytes in decimal format;
-			//Convert it to hexadecimal format
-			StringBuilder sb = new StringBuilder();
-			for(int i=0; i< bytes.length ;i++)
-			{
-				sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+			if (!list.isEmpty()) {
+				map.put("success", true);
+				map.put("object", list);
+			} else {
+				map.put("success", false);
+				map.put("error", "NO USERS FOUND WITH USERNAME " + username.toUpperCase());
 			}
-			//Get complete hashed password in hex format
-			passwordHash = sb.toString();
-			logger.info("Hash created.");
+		} catch (Exception e) {
+			logger.error("Exception occurred while fetching user with username " + username.toUpperCase() + ". Exception message is " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while fetching user with username " + username.toUpperCase() + ". Exception message is " + e.getMessage());
 		}
-		catch (NoSuchAlgorithmException e)
-		{
-			logger.error("Exception occured while creating hash for password. Exception Message "+ e.getMessage(), e);
-			throw new RuntimeException("Could not create hash of the password.");
-		}
-		return passwordHash;
+		return getResponse(new JSONObject(map));
 	}
 
 }

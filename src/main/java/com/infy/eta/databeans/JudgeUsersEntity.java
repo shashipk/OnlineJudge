@@ -2,6 +2,7 @@ package com.infy.eta.databeans;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.sql.Timestamp;
+import java.util.Collection;
 
 /**
  * Created by Amit Joshi on 10/5/2015.
@@ -9,13 +10,15 @@ import java.sql.Timestamp;
 @XmlRootElement
 public class JudgeUsersEntity {
 	private Integer id;
-	private String username;
-	private String password;
-	private String firstName;
-	private String lastName;
-	private String role;
+	private String  username;
+	private String  password;
+	private String  firstName;
+	private String  lastName;
+	private String  role;
 	private Timestamp inZ;
 	private Timestamp outZ;
+
+	private Collection<JudgeProblemsEntity> judgeProblemsByUsername;
 
 	public Integer getId() {
 		return id;
@@ -81,6 +84,14 @@ public class JudgeUsersEntity {
 		this.outZ = outZ;
 	}
 
+	public Collection<JudgeProblemsEntity> getJudgeProblemsByUsername() {
+		return judgeProblemsByUsername;
+	}
+
+	public void setJudgeProblemsByUsername(Collection<JudgeProblemsEntity> judgeProblemsByUsername) {
+		this.judgeProblemsByUsername = judgeProblemsByUsername;
+	}
+
 	@Override
 	public int hashCode() {
 		int result = id != null ? id.hashCode() : 0;
@@ -108,8 +119,7 @@ public class JudgeUsersEntity {
 		if (lastName != null ? !lastName.equals(that.lastName) : that.lastName != null) return false;
 		if (role != null ? !role.equals(that.role) : that.role != null) return false;
 		if (inZ != null ? !inZ.equals(that.inZ) : that.inZ != null) return false;
-		if (outZ != null ? !outZ.equals(that.outZ) : that.outZ != null) return false;
+		return !(outZ != null ? !outZ.equals(that.outZ) : that.outZ != null);
 
-		return true;
 	}
 }

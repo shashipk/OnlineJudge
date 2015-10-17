@@ -1,6 +1,7 @@
 package com.infy.eta.databeans;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.sql.Timestamp;
 import java.util.Collection;
 
 /**
@@ -8,14 +9,17 @@ import java.util.Collection;
  */
 @XmlRootElement
 public class JudgeProblemsEntity {
-	private Integer id;
-	private String title;
-	private String category;
-	private String subcategory;
-	private String problemStatement;
-	private String input;
-	private String constraints;
-	private String output;
+	private Integer   id;
+	private String    title;
+	private String    category;
+	private String    subcategory;
+	private String    problemStatement;
+	private String    input;
+	private String    constraints;
+	private String    output;
+	private String    addedBy;
+	private Timestamp addedOn;
+	private Timestamp modifiedOn;
 	private Collection<JudgeTestCasesEntity> judgeTestCasesById;
 
 	public Integer getId() {
@@ -82,6 +86,30 @@ public class JudgeProblemsEntity {
 		this.output = output;
 	}
 
+	public String getAddedBy() {
+		return addedBy;
+	}
+
+	public void setAddedBy(String addedBy) {
+		this.addedBy = addedBy;
+	}
+
+	public Timestamp getAddedOn() {
+		return addedOn;
+	}
+
+	public void setAddedOn(Timestamp addedOn) {
+		this.addedOn = addedOn;
+	}
+
+	public Timestamp getModifiedOn() {
+		return modifiedOn;
+	}
+
+	public void setModifiedOn(Timestamp modifiedOn) {
+		this.modifiedOn = modifiedOn;
+	}
+
 	@Override
 	public int hashCode() {
 		int result = id != null ? id.hashCode() : 0;
@@ -110,9 +138,8 @@ public class JudgeProblemsEntity {
 			return false;
 		if (input != null ? !input.equals(that.input) : that.input != null) return false;
 		if (constraints != null ? !constraints.equals(that.constraints) : that.constraints != null) return false;
-		if (output != null ? !output.equals(that.output) : that.output != null) return false;
+		return !(output != null ? !output.equals(that.output) : that.output != null);
 
-		return true;
 	}
 
 	public Collection<JudgeTestCasesEntity> getJudgeTestCasesById() {

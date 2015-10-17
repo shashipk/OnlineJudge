@@ -5,8 +5,7 @@ package com.infy.eta.utils;
  */
 public class TestComparator {
 
-	public boolean matchTestResults(String programOutput, String originalOutput){
-		if(programOutput.equalsIgnoreCase(originalOutput)) return true;
-		else return false;
+	public boolean matchTestResults(String programOutput, String originalOutput) {
+		return programOutput.equalsIgnoreCase(originalOutput);
 	}
 }

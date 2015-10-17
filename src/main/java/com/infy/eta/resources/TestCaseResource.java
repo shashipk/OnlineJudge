@@ -5,6 +5,7 @@ import com.infy.eta.utils.DoInTransaction;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+import org.json.JSONObject;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -15,61 +16,104 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by Amit Joshi on 10/7/2015.
  */
-@Path("/testcase")
+@Path("/testCase")
 public class TestCaseResource {
 
-	private Logger logger = Logger.getLogger(TestCaseResource.class);
+	private final Logger logger = Logger.getLogger(TestCaseResource.class);
 
 	@GET
 	@Path("/getAll/{problemId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllTestCasesForProblem(@PathParam("problemId") String problemId){
-		logger.info("Received request to get test cases for problem "+problemId);
-		Response response;
-		try{
+	public Response getAllTestCasesForProblem(@PathParam("problemId") String problemId) {
+		logger.info("Received request to get all test cases for problem " + problemId);
+		HashMap<String, Object> map = new HashMap<>();
+		try {
 			List<JudgeTestCasesEntity> testCases = new DoInTransaction<List<JudgeTestCasesEntity>>() {
 				@Override
 				protected List<JudgeTestCasesEntity> doWork() {
-					List<JudgeTestCasesEntity> testCases = new DoInTransaction<List<JudgeTestCasesEntity>>() {
+					return new DoInTransaction<List<JudgeTestCasesEntity>>() {
 						@Override
 						protected List<JudgeTestCasesEntity> doWork() {
 							Criteria criteria = session.createCriteria(JudgeTestCasesEntity.class);
 							return criteria.add(Restrictions.eq("problemId", Integer.parseInt(problemId))).list();
 						}
 					}.execute();
-					return  testCases;
 				}
 			}.execute();
-			response = Response.ok(testCases)
-			        .header("Access-Control-Allow-Headers", "Content-Type")
-			        .header("Access-Control-Allow-Methods", "GET, OPTIONS")
-			        .header("Access-Control-Allow-Origin", "*")
-			        .build();
-		} catch (Exception e){
-			logger.error("Exception occured while processing request with message "+ e.getMessage(),e);
-			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-			        .header("Access-Control-Allow-Headers", "Content-Type")
-			        .header("Access-Control-Allow-Methods", "GET, OPTIONS")
-			        .header("Access-Control-Allow-Origin", "*")
-			        .build();
+			if (!testCases.isEmpty()) {
+				map.put("success", true);
+				map.put("object", testCases);
+			} else {
+				map.put("success", false);
+				map.put("error", "NO PROBLEMS FOUND WITH PROBLEM ID " + problemId);
+			}
+		} catch (Exception e) {
+			logger.error("Exception occurred while processing request with message " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while processing request with message " + e.getMessage());
 		}
-		return  response;
+		return getResponse(new JSONObject(map));
+	}
+
+	private Response getResponse(JSONObject jsonObject) {
+		Response response;
+		response = Response.ok(jsonObject.toString())
+		                   .header("Access-Control-Allow-Headers", "Content-Type")
+		                   .header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		                   .header("Access-Control-Allow-Origin", "*")
+		                   .build();
+		return response;
+	}
+
+	@GET
+	@Path("/getOne/{problemId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getOneTestCaseForProblem(@PathParam("problemId") String problemId) {
+		logger.info("Received request to get one test case for problem " + problemId);
+		HashMap<String, Object> map = new HashMap<>();
+		try {
+			List<JudgeTestCasesEntity> testCases = new DoInTransaction<List<JudgeTestCasesEntity>>() {
+				@Override
+				protected List<JudgeTestCasesEntity> doWork() {
+					return new DoInTransaction<List<JudgeTestCasesEntity>>() {
+						@Override
+						protected List<JudgeTestCasesEntity> doWork() {
+							Criteria criteria = session.createCriteria(JudgeTestCasesEntity.class);
+							return criteria.add(Restrictions.eq("problemId", Integer.parseInt(problemId))).list();
+						}
+					}.execute();
+				}
+			}.execute();
+			if (!testCases.isEmpty()) {
+				map.put("success", true);
+				map.put("object", testCases);
+			} else {
+				map.put("success", false);
+				map.put("error", "NO TEST CASES WERE FOUND FOR THIS PROBLEM ID " + problemId);
+			}
+		} catch (Exception e) {
+			logger.error("Exception occurred while processing request with message " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while processing request with message " + e.getMessage());
+		}
+		return getResponse(new JSONObject(map));
 	}
 
 	@POST
 	@Path("/add")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public Response addTestCaseForProblem(@FormParam("problemId") String problemId, @FormParam("description")String description,
-	                                      @FormParam("input") String input, @FormParam("output") String output, @FormParam("points") String points){
-		logger.info("Received request to add test case for problem "+ problemId);
-		Response response;
-		try{
+	public Response addTestCaseForProblem(@FormParam("problemId") String problemId, @FormParam("description") String description,
+	                                      @FormParam("input") String input, @FormParam("output") String output, @FormParam("points") String points) {
+		logger.info("Received request to add test case for problem " + problemId);
+		HashMap<String, Object> map = new HashMap<>();
+		try {
 			JudgeTestCasesEntity testCase = new DoInTransaction<JudgeTestCasesEntity>() {
 				@Override
 				protected JudgeTestCasesEntity doWork() {
@@ -83,19 +127,18 @@ public class TestCaseResource {
 					return testCase;
 				}
 			}.execute();
-			response = Response.ok(testCase)
-			        .header("Access-Control-Allow-Headers", "Content-Type")
-			        .header("Access-Control-Allow-Methods", "POST, OPTIONS")
-			        .header("Access-Control-Allow-Origin", "*")
-			        .build();
-		} catch (Exception e){
-			logger.error("Exception occured while processing request with message "+ e.getMessage(),e);
-			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-			        .header("Access-Control-Allow-Headers", "Content-Type")
-			        .header("Access-Control-Allow-Methods", "POST, OPTIONS")
-			        .header("Access-Control-Allow-Origin", "*")
-			        .build();
+			if (testCase != null && testCase.getId() != null) {
+				map.put("success", true);
+				map.put("object", testCase);
+			} else {
+				map.put("success", false);
+				map.put("error", "COULD NOT SAVE THE TEST CASE");
+			}
+		} catch (Exception e) {
+			logger.error("Exception occurred while processing save test case request with message " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while processing save test case request with message " + e.getMessage());
 		}
-		return  response;
+		return getResponse(new JSONObject(map));
 	}
 }

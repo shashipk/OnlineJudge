@@ -1,14 +1,9 @@
 package com.infy.eta.resources;
 
-import com.infy.eta.databeans.JudgeCategoriesEntity;
 import com.infy.eta.databeans.JudgeProblemsEntity;
-import com.infy.eta.databeans.JudgeSubcategoriesEntity;
 import com.infy.eta.utils.DoInTransaction;
-import com.infy.eta.utils.HibernateUtil;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
-import org.hibernate.Transaction;
-import org.hibernate.classic.Session;
 import org.hibernate.criterion.Restrictions;
 import org.json.JSONObject;
 
@@ -21,6 +16,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -29,15 +27,151 @@ import java.util.List;
 @Path("/problem")
 public class ProblemResource {
 
-	private static Logger logger = Logger.getLogger(ProblemResource.class);
+	private static final Logger logger = Logger.getLogger(ProblemResource.class);
+
+	@GET
+	@Path("/get/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getProblem(@PathParam("id") String id) {
+		logger.info("Received request to get the problem data for id " + id);
+		HashMap<String, Object> map = new HashMap<>();
+		try {
+			Integer problemId = Integer.parseInt(id.substring(1));
+			List<JudgeProblemsEntity> problemList = new DoInTransaction<List<JudgeProblemsEntity>>() {
+				@Override
+				protected List<JudgeProblemsEntity> doWork() {
+					Criteria criteria = session.createCriteria(JudgeProblemsEntity.class);
+					criteria.add(Restrictions.eq("id", problemId));
+					List<JudgeProblemsEntity> list = criteria.list();
+					logger.info("Problem found " + list.get(0).getTitle());
+					return list;
+				}
+			}.execute();
+			if (!problemList.isEmpty()) {
+				map.put("success", true);
+				map.put("object", problemList);
+			} else {
+				map.put("success", false);
+				map.put("error", "Could not get Problem data with id " + id);
+			}
+		} catch (Exception e) {
+			logger.error("Exception occurred while processing request. Exception Message: " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while processing request. Exception Message: " + e.getMessage());
+		}
+		return getResponse(new JSONObject(map));
+	}
+
+	private Response getResponse(JSONObject jsonObject) {
+		Response response;
+		response = Response.ok(jsonObject.toString())
+		                   .header("Access-Control-Allow-Headers", "Content-Type")
+		                   .header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		                   .header("Access-Control-Allow-Origin", "*")
+		                   .build();
+		return response;
+	}
+
+	@GET
+	@Path("/getByUsername/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getProblemsByUsername(@PathParam("username") String username) {
+		logger.info("received request to get the problems for username " + username);
+		HashMap<String, Object> map = new HashMap<>();
+		try {
+			List<JudgeProblemsEntity> problemList = new DoInTransaction<List<JudgeProblemsEntity>>() {
+				@Override
+				protected List<JudgeProblemsEntity> doWork() {
+					Criteria criteria = session.createCriteria(JudgeProblemsEntity.class);
+					criteria.add(Restrictions.eq("addedBy", username));
+					return criteria.list();
+				}
+			}.execute();
+			if (!problemList.isEmpty()) {
+				logger.info("Problem found " + problemList.get(0).getTitle());
+				map.put("success", true);
+				map.put("object", problemList);
+			} else {
+				map.put("success", false);
+				map.put("error", "Could not find any problems for username" + username);
+			}
+		} catch (Exception e) {
+			logger.error("Exception occurred while processing request to get problems for username " + username.toUpperCase() + ". Exception  Message: " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while processing request to get problems for username " + username.toUpperCase() + ". Exception Message: " + e.getMessage());
+		}
+		return getResponse(new JSONObject(map));
+	}
+
+	@GET
+	@Path("/getAll")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllProblems() {
+		logger.info("Received request to get all problems");
+		HashMap<String, Object> map = new HashMap<>();
+		try {
+			List<JudgeProblemsEntity> list = new DoInTransaction<List<JudgeProblemsEntity>>() {
+				@Override
+				protected List<JudgeProblemsEntity> doWork() {
+					Criteria criteria = session.createCriteria(JudgeProblemsEntity.class);
+					return criteria.list();
+				}
+			}.execute();
+			if (!list.isEmpty()) {
+				map.put("success", true);
+				map.put("object", list);
+			} else {
+				map.put("success", false);
+				map.put("error", "THERE ARE NO PROBLEMS IN DATABASE");
+			}
+		} catch (Exception e) {
+			logger.error("Exception occurred while getting all problems. Exception message: " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while getting all problems. Exception message: " + e.getMessage());
+		}
+		return getResponse(new JSONObject(map));
+	}
+
+	@POST
+	@Path("/getProblems")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getProblems(@FormParam("category") String category, @FormParam("subCategory") String subCategory) {
+		logger.info("Received request to get all problems by category and subcategory");
+		HashMap<String, Object> map = new HashMap<>();
+		try {
+			List<JudgeProblemsEntity> list = new DoInTransaction<List<JudgeProblemsEntity>>() {
+				@Override
+				protected List<JudgeProblemsEntity> doWork() {
+					Criteria criteria = session.createCriteria(JudgeProblemsEntity.class);
+					if (!category.equals("")) {
+						criteria.add(Restrictions.eq("category", category));
+					}
+					if (!subCategory.equals("")) {
+						criteria.add(Restrictions.eq("subcategory", subCategory));
+					}
+					return criteria.list();
+				}
+			}.execute();
+			map.put("success", true);
+			map.put("object", list);
+		} catch (Exception e) {
+			logger.error("Exception occurred while processing request to get problems by category and subcategory with message " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while processing request to get problems by category and subcategory with message " + e.getMessage());
+		}
+		return getResponse(new JSONObject(map));
+	}
 
 	@POST
 	@Path("/add")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response submitProblem(@FormParam("title") String title, @FormParam("category") String category, @FormParam("subCategory") String subCategory, @FormParam("problemStatement") String problemStatement, @FormParam("input") String input, @FormParam("output") String output, @FormParam("constraints") String constraints) {
-		logger.info("Received submit problem request.");
-		Response response;
+	public Response submitProblem(@FormParam("title") String title, @FormParam("category") String category,
+	                              @FormParam("subCategory") String subCategory, @FormParam("problemStatement") String problemStatement,
+	                              @FormParam("input") String input, @FormParam("output") String output,
+	                              @FormParam("constraints") String constraints, @FormParam("username") String username) {
+		logger.info("Received request to add a problem.");
+		HashMap<String, Object> map = new HashMap<>();
 		try {
 			if (input != null && !input.isEmpty() && output != null && !output.isEmpty()) {
 				logger.info("All form parameters were received. Initializing hibernate session.");
@@ -52,99 +186,34 @@ public class ProblemResource {
 						problemsEntity.setConstraints(constraints);
 						problemsEntity.setCategory(category);
 						problemsEntity.setSubcategory(subCategory);
+						problemsEntity.setAddedBy(username.toUpperCase());
+						logger.info("Add request was sent by " + username);
+						Timestamp time = new Timestamp(new Date().getTime());
+						problemsEntity.setAddedOn(time);
+						problemsEntity.setModifiedOn(time);
 						session.saveOrUpdate(problemsEntity);
 						logger.info("Save or Update completed successfully");
 						return problemsEntity;
 					}
 				}.execute();
 				logger.info("Sending response now");
-				response = Response.ok(problemsEntity.getId())
-				                   .header("Access-Control-Allow-Headers", "Content-Type")
-				                   .header("Access-Control-Allow-Methods", "POST, OPTIONS")
-				                   .header("Access-Control-Allow-Origin", "*")
-				                   .build();
+				if (problemsEntity != null && problemsEntity.getId() != null) {
+					map.put("success", true);
+					map.put("object", problemsEntity);
+				} else {
+					map.put("success", false);
+					map.put("error", "COULD NOT ADD THIS PROBLEM");
+				}
 			} else {
 				logger.info("Some of the Form parameters were null. Sending BAD REQUEST response.");
-				response = Response.ok(new JSONObject("{success: false}").toString())
-				                   .header("Access-Control-Allow-Headers", "Content-Type")
-				                   .header("Access-Control-Allow-Methods", "POST, OPTIONS")
-				                   .header("Access-Control-Allow-Origin", "*")
-				                   .build();
+				map.put("success", false);
+				map.put("error", "Some of the Form parameters were null. BAD REQUEST ");
 			}
 		} catch (Exception e) {
 			logger.error("Exception occurred while saving problem to the database: Exception Message " + e.getMessage(), e);
-			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-			                   .header("Access-Control-Allow-Headers", "Content-Type")
-			                   .header("Access-Control-Allow-Methods", "POST, OPTIONS")
-			                   .header("Access-Control-Allow-Origin", "*")
-			                   .build();
+			map.put("success", false);
+			map.put("error", "Exception occurred while saving problem to the database: Exception Message " + e.getMessage());
 		}
-		return response;
+		return getResponse(new JSONObject(map));
 	}
-
-	@GET
-	@Path("/getAll")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getProblems() {
-		logger.info("Received response");
-		Response response;
-		try {
-			List<JudgeProblemsEntity> list = new DoInTransaction<List<JudgeProblemsEntity>>() {
-				@Override
-				protected List<JudgeProblemsEntity> doWork() {
-					Criteria criteria = session.createCriteria(JudgeProblemsEntity.class);
-					return criteria.list();
-				}
-			}.execute();
-			System.out.println("##########" + list);
-			response = Response.ok(list)
-			                   .header("Access-Control-Allow-Headers", "Content-Type")
-			                   .header("Access-Control-Allow-Methods", "GET, OPTIONS")
-			                   .header("Access-Control-Allow-Origin", "*")
-			                   .build();
-		} catch (Exception e) {
-			logger.error("Exception occurred while getting all problems. Exception message: " + e.getMessage(), e);
-			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-			                   .header("Access-Control-Allow-Headers", "Content-Type")
-			                   .header("Access-Control-Allow-Methods", "GET, OPTIONS")
-			                   .header("Access-Control-Allow-Origin", "*")
-			                   .build();
-		}
-		return response;
-	}
-
-	@GET
-	@Path("/get/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getProblem(@PathParam("id") String id) {
-		logger.info("received request to get the problem data for id "+ id);
-		Response response;
-		try {
-			Integer problemId = Integer.parseInt(id.substring(1));
-			List<JudgeProblemsEntity> problemList = new DoInTransaction<List<JudgeProblemsEntity>>() {
-				@Override
-				protected List<JudgeProblemsEntity> doWork() {
-					Criteria criteria = session.createCriteria(JudgeProblemsEntity.class);
-					criteria.add(Restrictions.eq("id", problemId));
-					List<JudgeProblemsEntity> list = criteria.list();
-					logger.info("Problem found "+ list.get(0).getTitle());
-					return list;
-				}
-			}.execute();
-			response = Response.ok(problemList.get(0))
-			                   .header("Access-Control-Allow-Headers", "Content-Type")
-			                   .header("Access-Control-Allow-Methods", "GET, OPTIONS")
-			                   .header("Access-Control-Allow-Origin", "*")
-			                   .build();
-		} catch (Exception e) {
-			logger.error("Exception occured while processing request. Exception Message: " + e.getMessage(), e);
-			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-			                   .header("Access-Control-Allow-Headers", "Content-Type")
-			                   .header("Access-Control-Allow-Methods", "GET, OPTIONS")
-			                   .header("Access-Control-Allow-Origin", "*")
-			                   .build();
-		}
-		return response;
-	}
-
 }

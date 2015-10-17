@@ -14,6 +14,10 @@ public class HibernateUtil {
 	private static SessionFactory sessionFactory;
 	private static Configuration  configuration;
 
+	public static SessionFactory reloadSessionFactory() {
+		return getConfiguration().buildSessionFactory();
+	}
+
 	public static Configuration getConfiguration() {
 		if (configuration == null) {
 			setConfiguration(new Configuration().configure());
@@ -25,20 +29,16 @@ public class HibernateUtil {
 		configuration = config;
 	}
 
+	public static void shutdown() {
+		// Close caches and connection pools
+		getSessionFactory().close();
+	}
+
 	public static SessionFactory getSessionFactory() {
 		if (sessionFactory == null) {
 			sessionFactory = getConfiguration().buildSessionFactory();
 		}
 		return sessionFactory;
-	}
-
-	public static SessionFactory reloadSessionFactory() {
-		return getConfiguration().buildSessionFactory();
-	}
-
-	public static void shutdown() {
-		// Close caches and connection pools
-		getSessionFactory().close();
 	}
 
 }

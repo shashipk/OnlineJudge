@@ -84,8 +84,7 @@ public class JudgeTestCasesEntity {
 		if (problemId != null ? !problemId.equals(that.problemId) : that.problemId != null) return false;
 		if (description != null ? !description.equals(that.description) : that.description != null) return false;
 		if (input != null ? !input.equals(that.input) : that.input != null) return false;
-		if (output != null ? !output.equals(that.output) : that.output != null) return false;
+		return !(output != null ? !output.equals(that.output) : that.output != null);
 
-		return true;
 	}
 }

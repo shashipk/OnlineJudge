@@ -53,8 +53,7 @@ public class JudgeSubcategoriesEntity {
 
 		if (id != null ? !id.equals(that.id) : that.id != null) return false;
 		if (subcategory != null ? !subcategory.equals(that.subcategory) : that.subcategory != null) return false;
-		if (description != null ? !description.equals(that.description) : that.description != null) return false;
+		return !(description != null ? !description.equals(that.description) : that.description != null);
 
-		return true;
 	}
 }
