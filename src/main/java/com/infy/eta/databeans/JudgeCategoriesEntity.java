@@ -1,12 +1,8 @@
 package com.infy.eta.databeans;
 
-
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
- * Created by Amit Joshi on 10/4/2015.
+ * Created by Amit Joshi on 10/17/2015.
  */
-@XmlRootElement
 public class JudgeCategoriesEntity {
 	private Integer id;
 	private String category;
@@ -53,7 +49,8 @@ public class JudgeCategoriesEntity {
 
 		if (id != null ? !id.equals(that.id) : that.id != null) return false;
 		if (category != null ? !category.equals(that.category) : that.category != null) return false;
-		return !(description != null ? !description.equals(that.description) : that.description != null);
+		if (description != null ? !description.equals(that.description) : that.description != null) return false;
 
+		return true;
 	}
 }

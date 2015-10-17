@@ -3,7 +3,6 @@
         "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-
     <class name="com.infy.eta.databeans.JudgeProblemsEntity" table="JUDGE_PROBLEMS" schema="JOAMIT">
         <id name="id" column="ID">
             <generator class="sequence-identity">
@@ -20,12 +19,11 @@
         <property name="addedBy" column="ADDED_BY"/>
         <property name="addedOn" column="ADDED_ON"/>
         <property name="modifiedOn" column="MODIFIED_ON"/>
-        <set name="judgeTestCasesById" inverse="true" lazy="true">
+        <set name="judgeTestCasesById" inverse="true">
             <key>
                 <column name="PROBLEM_ID" not-null="true"/>
             </key>
             <one-to-many not-found="ignore" class="com.infy.eta.databeans.JudgeTestCasesEntity"/>
         </set>
-
     </class>
 </hibernate-mapping>

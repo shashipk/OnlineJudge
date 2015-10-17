@@ -1,23 +1,21 @@
 package com.infy.eta.databeans;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.sql.Timestamp;
 import java.util.Collection;
 
 /**
- * Created by Amit Joshi on 10/4/2015.
+ * Created by Amit Joshi on 10/17/2015.
  */
-@XmlRootElement
 public class JudgeProblemsEntity {
-	private Integer   id;
-	private String    title;
-	private String    category;
-	private String    subcategory;
-	private String    problemStatement;
-	private String    input;
-	private String    constraints;
-	private String    output;
-	private String    addedBy;
+	private Integer id;
+	private String title;
+	private String category;
+	private String subcategory;
+	private String problemStatement;
+	private String input;
+	private String constraints;
+	private String output;
+	private String addedBy;
 	private Timestamp addedOn;
 	private Timestamp modifiedOn;
 	private Collection<JudgeTestCasesEntity> judgeTestCasesById;
@@ -120,6 +118,9 @@ public class JudgeProblemsEntity {
 		result = 31 * result + (input != null ? input.hashCode() : 0);
 		result = 31 * result + (constraints != null ? constraints.hashCode() : 0);
 		result = 31 * result + (output != null ? output.hashCode() : 0);
+		result = 31 * result + (addedBy != null ? addedBy.hashCode() : 0);
+		result = 31 * result + (addedOn != null ? addedOn.hashCode() : 0);
+		result = 31 * result + (modifiedOn != null ? modifiedOn.hashCode() : 0);
 		return result;
 	}
 
@@ -138,8 +139,12 @@ public class JudgeProblemsEntity {
 			return false;
 		if (input != null ? !input.equals(that.input) : that.input != null) return false;
 		if (constraints != null ? !constraints.equals(that.constraints) : that.constraints != null) return false;
-		return !(output != null ? !output.equals(that.output) : that.output != null);
+		if (output != null ? !output.equals(that.output) : that.output != null) return false;
+		if (addedBy != null ? !addedBy.equals(that.addedBy) : that.addedBy != null) return false;
+		if (addedOn != null ? !addedOn.equals(that.addedOn) : that.addedOn != null) return false;
+		if (modifiedOn != null ? !modifiedOn.equals(that.modifiedOn) : that.modifiedOn != null) return false;
 
+		return true;
 	}
 
 	public Collection<JudgeTestCasesEntity> getJudgeTestCasesById() {

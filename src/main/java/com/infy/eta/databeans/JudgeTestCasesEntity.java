@@ -1,12 +1,9 @@
 package com.infy.eta.databeans;
 
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
- * Created by Amit Joshi on 10/4/2015.
+ * Created by Amit Joshi on 10/17/2015.
  */
-@XmlRootElement
 public class JudgeTestCasesEntity {
 	private Integer id;
 	private Integer problemId;
@@ -14,14 +11,7 @@ public class JudgeTestCasesEntity {
 	private String input;
 	private String output;
 	private Integer points;
-
-	public Integer getPoints() {
-		return points;
-	}
-
-	public void setPoints(Integer points) {
-		this.points = points;
-	}
+	private JudgeProblemsEntity judgeProblemsByProblemId;
 
 	public Integer getId() {
 		return id;
@@ -63,6 +53,14 @@ public class JudgeTestCasesEntity {
 		this.output = output;
 	}
 
+	public Integer getPoints() {
+		return points;
+	}
+
+	public void setPoints(Integer points) {
+		this.points = points;
+	}
+
 	@Override
 	public int hashCode() {
 		int result = id != null ? id.hashCode() : 0;
@@ -70,6 +68,7 @@ public class JudgeTestCasesEntity {
 		result = 31 * result + (description != null ? description.hashCode() : 0);
 		result = 31 * result + (input != null ? input.hashCode() : 0);
 		result = 31 * result + (output != null ? output.hashCode() : 0);
+		result = 31 * result + (points != null ? points.hashCode() : 0);
 		return result;
 	}
 
@@ -84,7 +83,17 @@ public class JudgeTestCasesEntity {
 		if (problemId != null ? !problemId.equals(that.problemId) : that.problemId != null) return false;
 		if (description != null ? !description.equals(that.description) : that.description != null) return false;
 		if (input != null ? !input.equals(that.input) : that.input != null) return false;
-		return !(output != null ? !output.equals(that.output) : that.output != null);
+		if (output != null ? !output.equals(that.output) : that.output != null) return false;
+		if (points != null ? !points.equals(that.points) : that.points != null) return false;
 
+		return true;
+	}
+
+	public JudgeProblemsEntity getJudgeProblemsByProblemId() {
+		return judgeProblemsByProblemId;
+	}
+
+	public void setJudgeProblemsByProblemId(JudgeProblemsEntity judgeProblemsByProblemId) {
+		this.judgeProblemsByProblemId = judgeProblemsByProblemId;
 	}
 }
