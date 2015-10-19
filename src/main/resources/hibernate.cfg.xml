@@ -19,9 +19,11 @@
         <property name="bytecode.use_reflection_optimizer">true</property>
 
         <mapping resource="JudgeCategoriesEntity.hbm.xml"/>
+        <mapping resource="JudgeContestsEntity.hbm.xml"/>
         <mapping resource="JudgeProblemsEntity.hbm.xml"/>
         <mapping resource="JudgeSubcategoriesEntity.hbm.xml"/>
         <mapping resource="JudgeTestCasesEntity.hbm.xml"/>
         <mapping resource="JudgeUsersEntity.hbm.xml"/>
+        <mapping resource="JudgeUserSolvedProblemsEntity.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>

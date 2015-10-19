@@ -1,9 +1,8 @@
 package com.infy.eta.databeans;
 
 
-
 /**
- * Created by Amit Joshi on 10/17/2015.
+ * Created by Amit Joshi on 10/19/2015.
  */
 public class JudgeSubcategoriesEntity {
 	private Integer id;

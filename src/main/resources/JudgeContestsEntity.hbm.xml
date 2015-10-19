@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="com.infy.eta.databeans.JudgeContestsEntity" table="JUDGE_CONTESTS" schema="JOAMIT">
+        <id name="contestId" column="CONTEST_ID">
+            <generator class="sequence-identity">
+                <param name="sequence">JUDGE_CONTESTS_SEQ</param>
+            </generator>
+        </id>
+        <property name="contestName" column="CONTEST_NAME"/>
+        <property name="contestDescription" column="CONTEST_DESCRIPTION"/>
+        <property name="contestPrize" column="CONTEST_PRIZE"/>
+        <property name="contestOrganizer" column="CONTEST_ORGANIZER"/>
+        <property name="contestDuration" column="CONTEST_DURATION"/>
+        <property name="inZ" column="IN_Z"/>
+        <property name="outZ" column="OUT_Z"/>
+        <set name="judgeProblemsesByContestId" inverse="true">
+            <key>
+                <column name="CONTEST_ID" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="com.infy.eta.databeans.JudgeProblemsEntity"/>
+        </set>
+    </class>
+</hibernate-mapping>

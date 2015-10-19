@@ -3,7 +3,8 @@
         "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="com.infy.eta.databeans.JudgeCategoriesEntity" table="JUDGE_CATEGORIES" schema="JOAMIT">
+
+<class name="com.infy.eta.databeans.JudgeCategoriesEntity" table="JUDGE_CATEGORIES" schema="JOAMIT">
         <id name="id" column="ID">
             <generator class="sequence-identity">
                 <param name="sequence">JUDGE_CATEGORIES_SEQ</param>

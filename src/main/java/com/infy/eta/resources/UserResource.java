@@ -140,7 +140,7 @@ public class UserResource {
 		} catch (Exception e) {
 			logger.error("Exception occurred while trying to add user. Exception message is " + e.getMessage(), e);
 			map.put("success", false);
-			map.put("error", "Exception occurred while trying to add user. Exception message is " + e.getMessage());
+			map.put("error", "Exception occurred while trying to add user. Exception message is " + e.getCause().getMessage());
 		}
 		return getResponse(new JSONObject(map));
 	}

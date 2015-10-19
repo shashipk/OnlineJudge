@@ -4,17 +4,15 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 
-    <class name="com.infy.eta.databeans.JudgeTestCasesEntity" table="JUDGE_TEST_CASES" schema="JOAMIT">
+    <class name="com.infy.eta.databeans.JudgeUserSolvedProblemsEntity" table="JUDGE_USER_SOLVED_PROBLEMS"
+           schema="JOAMIT">
         <id name="id" column="ID">
             <generator class="sequence-identity">
-                <param name="sequence">JUDGE_TEST_CASES_SEQ</param>
+                <param name="sequence">JUDGE_USER_SOLVED_PROBLEM_SEQ</param>
             </generator>
         </id>
+        <property name="username" column="USERNAME"/>
         <property name="problemId" column="PROBLEM_ID"/>
-        <property name="description" column="DESCRIPTION"/>
-        <property name="input" column="INPUT"/>
-        <property name="output" column="OUTPUT"/>
-        <property name="points" column="POINTS"/>
         <many-to-one name="judgeProblemsByProblemId" class="com.infy.eta.databeans.JudgeProblemsEntity" insert="false"
                      update="false">
             <column name="PROBLEM_ID" not-null="true"/>

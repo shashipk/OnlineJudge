@@ -4,21 +4,24 @@ import java.sql.Timestamp;
 import java.util.Collection;
 
 /**
- * Created by Amit Joshi on 10/17/2015.
+ * Created by Amit Joshi on 10/19/2015.
  */
 public class JudgeProblemsEntity {
-	private Integer id;
-	private String title;
-	private String category;
-	private String subcategory;
-	private String problemStatement;
-	private String input;
-	private String constraints;
-	private String output;
-	private String addedBy;
-	private Timestamp addedOn;
-	private Timestamp modifiedOn;
-	private Collection<JudgeTestCasesEntity> judgeTestCasesById;
+	private Integer                                   id;
+	private String                                    title;
+	private String                                    category;
+	private String                                    subcategory;
+	private String                                    problemStatement;
+	private String                                    input;
+	private String                                    constraints;
+	private String                                    output;
+	private String                                    addedBy;
+	private Timestamp                                 addedOn;
+	private Timestamp                                 modifiedOn;
+	private Integer                                   contestId;
+	private JudgeContestsEntity                       judgeContestsByContestId;
+	private Collection<JudgeTestCasesEntity>          judgeTestCasesById;
+	private Collection<JudgeUserSolvedProblemsEntity> judgeUserSolvedProblemsesById;
 
 	public Integer getId() {
 		return id;
@@ -108,6 +111,14 @@ public class JudgeProblemsEntity {
 		this.modifiedOn = modifiedOn;
 	}
 
+	public Integer getContestId() {
+		return contestId;
+	}
+
+	public void setContestId(Integer contestId) {
+		this.contestId = contestId;
+	}
+
 	@Override
 	public int hashCode() {
 		int result = id != null ? id.hashCode() : 0;
@@ -121,6 +132,7 @@ public class JudgeProblemsEntity {
 		result = 31 * result + (addedBy != null ? addedBy.hashCode() : 0);
 		result = 31 * result + (addedOn != null ? addedOn.hashCode() : 0);
 		result = 31 * result + (modifiedOn != null ? modifiedOn.hashCode() : 0);
+		result = 31 * result + (contestId != null ? contestId.hashCode() : 0);
 		return result;
 	}
 
@@ -143,8 +155,17 @@ public class JudgeProblemsEntity {
 		if (addedBy != null ? !addedBy.equals(that.addedBy) : that.addedBy != null) return false;
 		if (addedOn != null ? !addedOn.equals(that.addedOn) : that.addedOn != null) return false;
 		if (modifiedOn != null ? !modifiedOn.equals(that.modifiedOn) : that.modifiedOn != null) return false;
+		if (contestId != null ? !contestId.equals(that.contestId) : that.contestId != null) return false;
 
 		return true;
+	}
+
+	public JudgeContestsEntity getJudgeContestsByContestId() {
+		return judgeContestsByContestId;
+	}
+
+	public void setJudgeContestsByContestId(JudgeContestsEntity judgeContestsByContestId) {
+		this.judgeContestsByContestId = judgeContestsByContestId;
 	}
 
 	public Collection<JudgeTestCasesEntity> getJudgeTestCasesById() {
@@ -153,5 +174,13 @@ public class JudgeProblemsEntity {
 
 	public void setJudgeTestCasesById(Collection<JudgeTestCasesEntity> judgeTestCasesById) {
 		this.judgeTestCasesById = judgeTestCasesById;
+	}
+
+	public Collection<JudgeUserSolvedProblemsEntity> getJudgeUserSolvedProblemsesById() {
+		return judgeUserSolvedProblemsesById;
+	}
+
+	public void setJudgeUserSolvedProblemsesById(Collection<JudgeUserSolvedProblemsEntity> judgeUserSolvedProblemsesById) {
+		this.judgeUserSolvedProblemsesById = judgeUserSolvedProblemsesById;
 	}
 }

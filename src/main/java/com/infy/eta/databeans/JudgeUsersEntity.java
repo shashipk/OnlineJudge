@@ -3,7 +3,7 @@ package com.infy.eta.databeans;
 import java.sql.Timestamp;
 
 /**
- * Created by Amit Joshi on 10/17/2015.
+ * Created by Amit Joshi on 10/19/2015.
  */
 public class JudgeUsersEntity {
 	private Integer id;
@@ -14,6 +14,7 @@ public class JudgeUsersEntity {
 	private String role;
 	private Timestamp inZ;
 	private Timestamp outZ;
+	private String loggedIn;
 
 	public Integer getId() {
 		return id;
@@ -79,6 +80,14 @@ public class JudgeUsersEntity {
 		this.outZ = outZ;
 	}
 
+	public String getLoggedIn() {
+		return loggedIn;
+	}
+
+	public void setLoggedIn(String loggedIn) {
+		this.loggedIn = loggedIn;
+	}
+
 	@Override
 	public int hashCode() {
 		int result = id != null ? id.hashCode() : 0;
@@ -89,6 +98,7 @@ public class JudgeUsersEntity {
 		result = 31 * result + (role != null ? role.hashCode() : 0);
 		result = 31 * result + (inZ != null ? inZ.hashCode() : 0);
 		result = 31 * result + (outZ != null ? outZ.hashCode() : 0);
+		result = 31 * result + (loggedIn != null ? loggedIn.hashCode() : 0);
 		return result;
 	}
 
@@ -107,6 +117,7 @@ public class JudgeUsersEntity {
 		if (role != null ? !role.equals(that.role) : that.role != null) return false;
 		if (inZ != null ? !inZ.equals(that.inZ) : that.inZ != null) return false;
 		if (outZ != null ? !outZ.equals(that.outZ) : that.outZ != null) return false;
+		if (loggedIn != null ? !loggedIn.equals(that.loggedIn) : that.loggedIn != null) return false;
 
 		return true;
 	}
