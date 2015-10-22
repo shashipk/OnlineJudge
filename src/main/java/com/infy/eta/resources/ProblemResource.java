@@ -1,6 +1,6 @@
 package com.infy.eta.resources;
 
-import com.infy.eta.databeans.JudgeProblemsEntity;
+import com.infy.eta.databeans.JudgeProblems;
 import com.infy.eta.utils.DoInTransaction;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -37,12 +37,12 @@ public class ProblemResource {
 		HashMap<String, Object> map = new HashMap<>();
 		try {
 			Integer problemId = Integer.parseInt(id.substring(1));
-			List<JudgeProblemsEntity> problemList = new DoInTransaction<List<JudgeProblemsEntity>>() {
+			List<JudgeProblems> problemList = new DoInTransaction<List<JudgeProblems>>() {
 				@Override
-				protected List<JudgeProblemsEntity> doWork() {
-					Criteria criteria = session.createCriteria(JudgeProblemsEntity.class);
+				protected List<JudgeProblems> doWork() {
+					Criteria criteria = session.createCriteria(JudgeProblems.class);
 					criteria.add(Restrictions.eq("id", problemId));
-					List<JudgeProblemsEntity> list = criteria.list();
+					List<JudgeProblems> list = criteria.list();
 					logger.info("Problem found " + list.get(0).getTitle());
 					return list;
 				}
@@ -79,10 +79,10 @@ public class ProblemResource {
 		logger.info("received request to get the problems for username " + username);
 		HashMap<String, Object> map = new HashMap<>();
 		try {
-			List<JudgeProblemsEntity> problemList = new DoInTransaction<List<JudgeProblemsEntity>>() {
+			List<JudgeProblems> problemList = new DoInTransaction<List<JudgeProblems>>() {
 				@Override
-				protected List<JudgeProblemsEntity> doWork() {
-					Criteria criteria = session.createCriteria(JudgeProblemsEntity.class);
+				protected List<JudgeProblems> doWork() {
+					Criteria criteria = session.createCriteria(JudgeProblems.class);
 					criteria.add(Restrictions.eq("addedBy", username));
 					return criteria.list();
 				}
@@ -110,10 +110,10 @@ public class ProblemResource {
 		logger.info("Received request to get all problems");
 		HashMap<String, Object> map = new HashMap<>();
 		try {
-			List<JudgeProblemsEntity> list = new DoInTransaction<List<JudgeProblemsEntity>>() {
+			List<JudgeProblems> list = new DoInTransaction<List<JudgeProblems>>() {
 				@Override
-				protected List<JudgeProblemsEntity> doWork() {
-					Criteria criteria = session.createCriteria(JudgeProblemsEntity.class);
+				protected List<JudgeProblems> doWork() {
+					Criteria criteria = session.createCriteria(JudgeProblems.class);
 					return criteria.list();
 				}
 			}.execute();
@@ -139,10 +139,10 @@ public class ProblemResource {
 		logger.info("Received request to get all problems by category and subcategory");
 		HashMap<String, Object> map = new HashMap<>();
 		try {
-			List<JudgeProblemsEntity> list = new DoInTransaction<List<JudgeProblemsEntity>>() {
+			List<JudgeProblems> list = new DoInTransaction<List<JudgeProblems>>() {
 				@Override
-				protected List<JudgeProblemsEntity> doWork() {
-					Criteria criteria = session.createCriteria(JudgeProblemsEntity.class);
+				protected List<JudgeProblems> doWork() {
+					Criteria criteria = session.createCriteria(JudgeProblems.class);
 					if (!category.equals("")) {
 						criteria.add(Restrictions.eq("category", category));
 					}
@@ -175,31 +175,31 @@ public class ProblemResource {
 		try {
 			if (input != null && !input.isEmpty() && output != null && !output.isEmpty()) {
 				logger.info("All form parameters were received. Initializing hibernate session.");
-				JudgeProblemsEntity problemsEntity = new DoInTransaction<JudgeProblemsEntity>() {
+				JudgeProblems problems = new DoInTransaction<JudgeProblems>() {
 					@Override
-					protected JudgeProblemsEntity doWork() {
-						JudgeProblemsEntity problemsEntity = new JudgeProblemsEntity();
-						problemsEntity.setProblemStatement(problemStatement);
-						problemsEntity.setInput(input);
-						problemsEntity.setOutput(output);
-						problemsEntity.setTitle(title);
-						problemsEntity.setConstraints(constraints);
-						problemsEntity.setCategory(category);
-						problemsEntity.setSubcategory(subCategory);
-						problemsEntity.setAddedBy(username.toUpperCase());
+					protected JudgeProblems doWork() {
+						JudgeProblems problems = new JudgeProblems();
+						problems.setProblemStatement(problemStatement);
+						problems.setInput(input);
+						problems.setOutput(output);
+						problems.setTitle(title);
+						problems.setConstraints(constraints);
+						problems.setCategory(category);
+						problems.setSubcategory(subCategory);
+						problems.setAddedBy(username.toUpperCase());
 						logger.info("Add request was sent by " + username);
 						Timestamp time = new Timestamp(new Date().getTime());
-						problemsEntity.setAddedOn(time);
-						problemsEntity.setModifiedOn(time);
-						session.saveOrUpdate(problemsEntity);
+						problems.setAddedOn(time);
+						problems.setModifiedOn(time);
+						session.saveOrUpdate(problems);
 						logger.info("Save or Update completed successfully");
-						return problemsEntity;
+						return problems;
 					}
 				}.execute();
 				logger.info("Sending response now");
-				if (problemsEntity != null && problemsEntity.getId() != null) {
+				if (problems != null && problems.getId() != null) {
 					map.put("success", true);
-					map.put("object", problemsEntity);
+					map.put("object", problems);
 				} else {
 					map.put("success", false);
 					map.put("error", "COULD NOT ADD THIS PROBLEM");

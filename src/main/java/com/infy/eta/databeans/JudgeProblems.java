@@ -4,24 +4,24 @@ import java.sql.Timestamp;
 import java.util.Collection;
 
 /**
- * Created by Amit Joshi on 10/19/2015.
+ * Created by Amit Joshi on 10/22/2015.
  */
-public class JudgeProblemsEntity {
-	private Integer                                   id;
-	private String                                    title;
-	private String                                    category;
-	private String                                    subcategory;
-	private String                                    problemStatement;
-	private String                                    input;
-	private String                                    constraints;
-	private String                                    output;
-	private String                                    addedBy;
-	private Timestamp                                 addedOn;
-	private Timestamp                                 modifiedOn;
-	private Integer                                   contestId;
-	private JudgeContestsEntity                       judgeContestsByContestId;
-	private Collection<JudgeTestCasesEntity>          judgeTestCasesById;
-	private Collection<JudgeUserSolvedProblemsEntity> judgeUserSolvedProblemsesById;
+public class JudgeProblems {
+	private Integer                             id;
+	private String                              title;
+	private String                              category;
+	private String                              subcategory;
+	private String                              problemStatement;
+	private String                              input;
+	private String                              constraints;
+	private String                              output;
+	private String                              addedBy;
+	private Timestamp                           addedOn;
+	private Timestamp                           modifiedOn;
+	private Integer                             contestId;
+	private JudgeContests                       judgeContestsByContestId;
+	private Collection<JudgeTestCases>          judgeTestCasesById;
+	private Collection<JudgeUserSolvedProblems> judgeUserSolvedProblemsesById;
 
 	public Integer getId() {
 		return id;
@@ -121,7 +121,7 @@ public class JudgeProblemsEntity {
 
 	@Override
 	public int hashCode() {
-		int result = id != null ? id.hashCode() : 0;
+		int result = id;
 		result = 31 * result + (title != null ? title.hashCode() : 0);
 		result = 31 * result + (category != null ? category.hashCode() : 0);
 		result = 31 * result + (subcategory != null ? subcategory.hashCode() : 0);
@@ -141,9 +141,9 @@ public class JudgeProblemsEntity {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		JudgeProblemsEntity that = (JudgeProblemsEntity) o;
+		JudgeProblems that = (JudgeProblems) o;
 
-		if (id != null ? !id.equals(that.id) : that.id != null) return false;
+		if (id != that.id) return false;
 		if (title != null ? !title.equals(that.title) : that.title != null) return false;
 		if (category != null ? !category.equals(that.category) : that.category != null) return false;
 		if (subcategory != null ? !subcategory.equals(that.subcategory) : that.subcategory != null) return false;
@@ -160,27 +160,27 @@ public class JudgeProblemsEntity {
 		return true;
 	}
 
-	public JudgeContestsEntity getJudgeContestsByContestId() {
+	public JudgeContests getJudgeContestsByContestId() {
 		return judgeContestsByContestId;
 	}
 
-	public void setJudgeContestsByContestId(JudgeContestsEntity judgeContestsByContestId) {
+	public void setJudgeContestsByContestId(JudgeContests judgeContestsByContestId) {
 		this.judgeContestsByContestId = judgeContestsByContestId;
 	}
 
-	public Collection<JudgeTestCasesEntity> getJudgeTestCasesById() {
+	public Collection<JudgeTestCases> getJudgeTestCasesById() {
 		return judgeTestCasesById;
 	}
 
-	public void setJudgeTestCasesById(Collection<JudgeTestCasesEntity> judgeTestCasesById) {
+	public void setJudgeTestCasesById(Collection<JudgeTestCases> judgeTestCasesById) {
 		this.judgeTestCasesById = judgeTestCasesById;
 	}
 
-	public Collection<JudgeUserSolvedProblemsEntity> getJudgeUserSolvedProblemsesById() {
+	public Collection<JudgeUserSolvedProblems> getJudgeUserSolvedProblemsesById() {
 		return judgeUserSolvedProblemsesById;
 	}
 
-	public void setJudgeUserSolvedProblemsesById(Collection<JudgeUserSolvedProblemsEntity> judgeUserSolvedProblemsesById) {
+	public void setJudgeUserSolvedProblemsesById(Collection<JudgeUserSolvedProblems> judgeUserSolvedProblemsesById) {
 		this.judgeUserSolvedProblemsesById = judgeUserSolvedProblemsesById;
 	}
 }

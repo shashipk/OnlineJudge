@@ -1,12 +1,13 @@
 package com.infy.eta.compilers;
 
-import com.infy.eta.databeans.JudgeTestCasesEntity;
+import com.infy.eta.databeans.JudgeTestCases;
 import com.infy.eta.utils.DoInTransaction;
 import com.infy.eta.utils.TestComparator;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.ws.rs.FormParam;
 import java.io.File;
@@ -16,7 +17,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -29,56 +29,28 @@ public class JavaCompiler {
 
 	private final String    data;
 	private final Integer   problemId;
-	private final JSONArray compilerOutput;
+	private final JSONArray runOutput;
 
 	public JavaCompiler(String data, Integer problemId) {
 		this.data = data;
 		this.problemId = problemId;
-		compilerOutput = new JSONArray();
+		runOutput = new JSONArray();
 	}
 
 	public String invoke() throws IOException, InterruptedException {
 		logger.info("Received post request with data " + data);
-		StringBuffer buffer = new StringBuffer("");
 		String       programFilePath;
 		//create a java file Test.java
 		File file = createJavaFile(data);
 		programFilePath = FilenameUtils.getFullPath(file.getAbsolutePath());
 		logger.info("File Path of java file is " + programFilePath);
 		//create a batch file to execute compile and run commands
-		List<JudgeTestCasesEntity> testCases = fetchTestCasesForProblem(problemId);
-		logger.info("Test cases for this problem are: " + testCases.size());
-		for (JudgeTestCasesEntity testCase : testCases) {
-			HashMap<String, String> object = new HashMap<>();
-			object.put("id", String.valueOf(testCase.getId()));
-			object.put("problemId", String.valueOf(testCase.getProblemId()));
-			object.put("description", testCase.getDescription());
-			object.put("input", testCase.getInput());
-			object.put("expectedOutput", testCase.getOutput());
-			createBatchFile(file, programFilePath, testCase.getInput());
-			//execute the batch file
-			Runtime r = Runtime.getRuntime();
-
-			Process p = r.exec(programFilePath + "Test.bat"); // execute the compiler script
-
-			boolean waitReturn = p.waitFor(5, TimeUnit.SECONDS);
-			if (!waitReturn) {
-				p.destroyForcibly();
-			}
-			logger.info(waitReturn);
-			//read output and return it as a response
-			readOutput(buffer);
-			object.put("actualOutput", buffer.toString().replaceAll("\\u0000", ""));
-			//delete the files now
-			deleteFiles(programFilePath);
-
-			boolean testResult = new TestComparator().matchTestResults(buffer.toString(), testCase.getOutput());
-			object.put("result", String.valueOf(testResult));
-			object.put("totalPoints", String.valueOf(testCase.getPoints()));
-			object.put("earnedPoints", testResult ? String.valueOf(testCase.getPoints()) : String.valueOf(0));
-			compilerOutput.put(object);
+		List<JudgeTestCases> testCases = fetchTestCasesForProblem(problemId);
+		logger.info("Test cases for this problem id " + problemId + " are: " + testCases.size());
+		for (JudgeTestCases testCase : testCases) {
+			runOutput.put(invokeTestCase(programFilePath, file, testCase));
 		}
-		return compilerOutput.toString();
+		return runOutput.toString();
 	}
 
 	private File createJavaFile(@FormParam("data") String data) throws IOException {
@@ -92,13 +64,46 @@ public class JavaCompiler {
 		return file;
 	}
 
-	private List<JudgeTestCasesEntity> fetchTestCasesForProblem(Integer problemId) {
-		return new DoInTransaction<List<JudgeTestCasesEntity>>() {
+	private List<JudgeTestCases> fetchTestCasesForProblem(Integer problemId) {
+		logger.info("Fetching test cases for problem id " + problemId);
+		return new DoInTransaction<List<JudgeTestCases>>() {
 			@Override
-			protected List<JudgeTestCasesEntity> doWork() {
-				return session.createCriteria(JudgeTestCasesEntity.class).add(Restrictions.eq("problemId", problemId)).list();
+			protected List<JudgeTestCases> doWork() {
+				return session.createCriteria(JudgeTestCases.class).add(Restrictions.eq("problemId", problemId)).list();
 			}
 		}.execute();
+	}
+
+	private JSONObject invokeTestCase(String programFilePath, File file, JudgeTestCases testCase) throws IOException, InterruptedException {
+		StringBuffer buffer = new StringBuffer();
+		JSONObject   object = new JSONObject();
+		object.put("ID", String.valueOf(testCase.getId()));
+		object.put("ProblemID", String.valueOf(testCase.getProblemId()));
+		object.put("Description", testCase.getDescription());
+		object.put("TestInput", testCase.getInput());
+		object.put("ExpectedOutput", testCase.getOutput());
+		createBatchFile(file, programFilePath, testCase.getInput());
+		//execute the batch file
+		Runtime r = Runtime.getRuntime();
+
+		Process p = r.exec(programFilePath + "Test.bat"); // execute the compiler script
+
+		boolean waitReturn = p.waitFor(5, TimeUnit.SECONDS);
+		if (!waitReturn) {
+			p.destroyForcibly();
+		}
+		logger.info(waitReturn);
+		//read output and return it as a response
+		readOutput(buffer);
+		object.put("ActualOutput", buffer.toString().replaceAll("\\u0000", "").replaceAll("\\r\\n", "").replaceAll("\\n", ""));
+		//delete the files now
+		deleteFiles(programFilePath);
+
+		boolean testResult = new TestComparator().matchTestResults(String.valueOf(object.get("ActualOutput")), String.valueOf(object.get("ExpectedOutput")));
+		object.put("Output", String.valueOf(testResult));
+		object.put("TotalPoints", String.valueOf(testCase.getPoints()));
+		object.put("EarnedPoints", testResult ? String.valueOf(testCase.getPoints()) : String.valueOf(0));
+		return object;
 	}
 
 	private void createBatchFile(File file, String programFilePath, String input) throws IOException {

@@ -1,6 +1,6 @@
 package com.infy.eta.resources;
 
-import com.infy.eta.databeans.JudgeTestCasesEntity;
+import com.infy.eta.databeans.JudgeTestCases;
 import com.infy.eta.utils.DoInTransaction;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -34,13 +34,13 @@ public class TestCaseResource {
 		logger.info("Received request to get all test cases for problem " + problemId);
 		HashMap<String, Object> map = new HashMap<>();
 		try {
-			List<JudgeTestCasesEntity> testCases = new DoInTransaction<List<JudgeTestCasesEntity>>() {
+			List<JudgeTestCases> testCases = new DoInTransaction<List<JudgeTestCases>>() {
 				@Override
-				protected List<JudgeTestCasesEntity> doWork() {
-					return new DoInTransaction<List<JudgeTestCasesEntity>>() {
+				protected List<JudgeTestCases> doWork() {
+					return new DoInTransaction<List<JudgeTestCases>>() {
 						@Override
-						protected List<JudgeTestCasesEntity> doWork() {
-							Criteria criteria = session.createCriteria(JudgeTestCasesEntity.class);
+						protected List<JudgeTestCases> doWork() {
+							Criteria criteria = session.createCriteria(JudgeTestCases.class);
 							return criteria.add(Restrictions.eq("problemId", Integer.parseInt(problemId))).list();
 						}
 					}.execute();
@@ -78,13 +78,13 @@ public class TestCaseResource {
 		logger.info("Received request to get one test case for problem " + problemId);
 		HashMap<String, Object> map = new HashMap<>();
 		try {
-			List<JudgeTestCasesEntity> testCases = new DoInTransaction<List<JudgeTestCasesEntity>>() {
+			List<JudgeTestCases> testCases = new DoInTransaction<List<JudgeTestCases>>() {
 				@Override
-				protected List<JudgeTestCasesEntity> doWork() {
-					return new DoInTransaction<List<JudgeTestCasesEntity>>() {
+				protected List<JudgeTestCases> doWork() {
+					return new DoInTransaction<List<JudgeTestCases>>() {
 						@Override
-						protected List<JudgeTestCasesEntity> doWork() {
-							Criteria criteria = session.createCriteria(JudgeTestCasesEntity.class);
+						protected List<JudgeTestCases> doWork() {
+							Criteria criteria = session.createCriteria(JudgeTestCases.class);
 							return criteria.add(Restrictions.eq("problemId", Integer.parseInt(problemId))).list();
 						}
 					}.execute();
@@ -114,10 +114,10 @@ public class TestCaseResource {
 		logger.info("Received request to add test case for problem " + problemId);
 		HashMap<String, Object> map = new HashMap<>();
 		try {
-			JudgeTestCasesEntity testCase = new DoInTransaction<JudgeTestCasesEntity>() {
+			JudgeTestCases testCase = new DoInTransaction<JudgeTestCases>() {
 				@Override
-				protected JudgeTestCasesEntity doWork() {
-					JudgeTestCasesEntity testCase = new JudgeTestCasesEntity();
+				protected JudgeTestCases doWork() {
+					JudgeTestCases testCase = new JudgeTestCases();
 					testCase.setDescription(description);
 					testCase.setInput(input);
 					testCase.setOutput(output);

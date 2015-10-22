@@ -1,16 +1,16 @@
 package com.infy.eta.databeans;
 
 /**
- * Created by Amit Joshi on 10/19/2015.
+ * Created by Amit Joshi on 10/22/2015.
  */
-public class JudgeTestCasesEntity {
+public class JudgeTestCases {
 	private Integer id;
 	private Integer problemId;
 	private String description;
 	private String input;
 	private String output;
 	private Integer points;
-	private JudgeProblemsEntity judgeProblemsByProblemId;
+	private JudgeProblems judgeProblemsByProblemId;
 
 	public Integer getId() {
 		return id;
@@ -62,12 +62,12 @@ public class JudgeTestCasesEntity {
 
 	@Override
 	public int hashCode() {
-		int result = id != null ? id.hashCode() : 0;
-		result = 31 * result + (problemId != null ? problemId.hashCode() : 0);
+		int result = id;
+		result = 31 * result + problemId;
 		result = 31 * result + (description != null ? description.hashCode() : 0);
 		result = 31 * result + (input != null ? input.hashCode() : 0);
 		result = 31 * result + (output != null ? output.hashCode() : 0);
-		result = 31 * result + (points != null ? points.hashCode() : 0);
+		result = 31 * result + points;
 		return result;
 	}
 
@@ -76,23 +76,23 @@ public class JudgeTestCasesEntity {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		JudgeTestCasesEntity that = (JudgeTestCasesEntity) o;
+		JudgeTestCases that = (JudgeTestCases) o;
 
-		if (id != null ? !id.equals(that.id) : that.id != null) return false;
-		if (problemId != null ? !problemId.equals(that.problemId) : that.problemId != null) return false;
+		if (id != that.id) return false;
+		if (problemId != that.problemId) return false;
+		if (points != that.points) return false;
 		if (description != null ? !description.equals(that.description) : that.description != null) return false;
 		if (input != null ? !input.equals(that.input) : that.input != null) return false;
 		if (output != null ? !output.equals(that.output) : that.output != null) return false;
-		if (points != null ? !points.equals(that.points) : that.points != null) return false;
 
 		return true;
 	}
 
-	public JudgeProblemsEntity getJudgeProblemsByProblemId() {
+	public JudgeProblems getJudgeProblemsByProblemId() {
 		return judgeProblemsByProblemId;
 	}
 
-	public void setJudgeProblemsByProblemId(JudgeProblemsEntity judgeProblemsByProblemId) {
+	public void setJudgeProblemsByProblemId(JudgeProblems judgeProblemsByProblemId) {
 		this.judgeProblemsByProblemId = judgeProblemsByProblemId;
 	}
 }

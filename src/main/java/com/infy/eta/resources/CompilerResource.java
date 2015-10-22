@@ -25,7 +25,7 @@ public class CompilerResource {
 		logger.info("Request received to compile " + data + " for problem " + problemId);
 		HashMap<String, Object> map = new HashMap<>();
 		try {
-			String output = new JavaCompiler(data, Integer.valueOf(problemId.substring(1))).invoke();
+			String output = new JavaCompiler(data, Integer.valueOf(problemId)).invoke();
 			map.put("success", true);
 			map.put("object", output.replace("\u0000", "").trim());
 		} catch (Exception e) {

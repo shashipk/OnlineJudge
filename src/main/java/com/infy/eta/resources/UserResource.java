@@ -1,6 +1,6 @@
 package com.infy.eta.resources;
 
-import com.infy.eta.databeans.JudgeUsersEntity;
+import com.infy.eta.databeans.JudgeUsers;
 import com.infy.eta.utils.DoInTransaction;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -42,13 +42,17 @@ public class UserResource {
 		try {
 			//convert password into a MD5 hash
 			String hashedPassword = createHashedPassword(password);
-			List<JudgeUsersEntity> list = new DoInTransaction<List<JudgeUsersEntity>>() {
+			List<JudgeUsers> list = new DoInTransaction<List<JudgeUsers>>() {
 				@Override
-				protected List<JudgeUsersEntity> doWork() {
-					Criteria criteria = session.createCriteria(JudgeUsersEntity.class);
+				protected List<JudgeUsers> doWork() {
+					Criteria criteria = session.createCriteria(JudgeUsers.class);
 					criteria.add(Restrictions.eq("username", username.toUpperCase()));
 					criteria.add(Restrictions.eq("password", hashedPassword));
-					return criteria.list();
+					List<JudgeUsers> list = criteria.list();
+					//mark user logged in and save the object
+					list.get(0).setLoggedIn('Y');
+					session.save(list.get(0));
+					return list;
 				}
 			}.execute();
 			if (list.size() == 1 && list.get(0).getUsername().equalsIgnoreCase(username)) {
@@ -104,6 +108,35 @@ public class UserResource {
 		return response;
 	}
 
+	@GET
+	@Path("/logout/{username}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response logout(@PathParam("username") String username) {
+		logger.info("Received logout info for user " + username);
+		HashMap<String, Object> map = new HashMap<>();
+		try {
+			JudgeUsers user = new DoInTransaction<JudgeUsers>() {
+				@Override
+				protected JudgeUsers doWork() {
+					JudgeUsers user = (JudgeUsers) session.createCriteria(JudgeUsers.class).add(Restrictions.eq("username", username)).uniqueResult();
+					if (user != null) {
+						user.setLoggedIn('N');
+						session.save(user);
+					}
+					return user;
+				}
+			}.execute();
+			map.put("success", true);
+			map.put("object", user);
+		} catch (Exception e) {
+			logger.error("Exception occurred while checking login credentials. Exception message is " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while checking login credentials. Exception message is " + e.getMessage());
+		}
+		return getResponse(new JSONObject(map));
+	}
+
 	@POST
 	@Path("/add")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -115,24 +148,24 @@ public class UserResource {
 		try {
 			//convert password into a MD5 hash
 			String hashedPassword = createHashedPassword(password);
-			JudgeUsersEntity usersEntity = new DoInTransaction<JudgeUsersEntity>() {
+			JudgeUsers users = new DoInTransaction<JudgeUsers>() {
 				@Override
-				protected JudgeUsersEntity doWork() {
-					JudgeUsersEntity usersEntity = new JudgeUsersEntity();
-					usersEntity.setUsername(username.toUpperCase());
-					usersEntity.setPassword(hashedPassword);
-					usersEntity.setFirstName(firstName);
-					usersEntity.setLastName(lastName);
-					usersEntity.setInZ(new Timestamp(new Date().getTime()));
+				protected JudgeUsers doWork() {
+					JudgeUsers users = new JudgeUsers();
+					users.setUsername(username.toUpperCase());
+					users.setPassword(hashedPassword);
+					users.setFirstName(firstName);
+					users.setLastName(lastName);
+					users.setInZ(new Timestamp(new Date().getTime()));
 					DateTime outZ = new DateTime(2099, 1, 1, 12, 00);
-					usersEntity.setOutZ(new Timestamp(outZ.getMillis()));
-					session.save(usersEntity);
-					return usersEntity;
+					users.setOutZ(new Timestamp(outZ.getMillis()));
+					session.save(users);
+					return users;
 				}
 			}.execute();
-			if (usersEntity != null && usersEntity.getId() != null) {
+			if (users != null && users.getId() != 0) {
 				map.put("success", true);
-				map.put("object", usersEntity);
+				map.put("object", users);
 			} else {
 				map.put("success", false);
 				map.put("error", "COULD NOT SAVE USER DETAILS. PLEASE TRY AGAIN");
@@ -152,10 +185,10 @@ public class UserResource {
 		logger.info("Received request to get all users");
 		HashMap<String, Object> map = new HashMap<>();
 		try {
-			List<JudgeUsersEntity> list = new DoInTransaction<List<JudgeUsersEntity>>() {
+			List<JudgeUsers> list = new DoInTransaction<List<JudgeUsers>>() {
 				@Override
-				protected List<JudgeUsersEntity> doWork() {
-					return session.createCriteria(JudgeUsersEntity.class).list();
+				protected List<JudgeUsers> doWork() {
+					return session.createCriteria(JudgeUsers.class).list();
 				}
 			}.execute();
 			if (!list.isEmpty()) {
@@ -180,10 +213,10 @@ public class UserResource {
 		logger.info("Received request to get user data for " + username);
 		HashMap<String, Object> map = new HashMap<>();
 		try {
-			List<JudgeUsersEntity> list = new DoInTransaction<List<JudgeUsersEntity>>() {
+			List<JudgeUsers> list = new DoInTransaction<List<JudgeUsers>>() {
 				@Override
-				protected List<JudgeUsersEntity> doWork() {
-					return session.createCriteria(JudgeUsersEntity.class).add(Restrictions.eq("username", username.toUpperCase())).list();
+				protected List<JudgeUsers> doWork() {
+					return session.createCriteria(JudgeUsers.class).add(Restrictions.eq("username", username.toUpperCase())).list();
 				}
 			}.execute();
 			if (!list.isEmpty()) {
@@ -197,6 +230,35 @@ public class UserResource {
 			logger.error("Exception occurred while fetching user with username " + username.toUpperCase() + ". Exception message is " + e.getMessage(), e);
 			map.put("success", false);
 			map.put("error", "Exception occurred while fetching user with username " + username.toUpperCase() + ". Exception message is " + e.getMessage());
+		}
+		return getResponse(new JSONObject(map));
+	}
+
+	@GET
+	@Path("/getLoggedIn")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getLoggedInUsers() {
+		logger.info("Received request to get all users");
+		HashMap<String, Object> map = new HashMap<>();
+		try {
+			List<JudgeUsers> list = new DoInTransaction<List<JudgeUsers>>() {
+				@Override
+				protected List<JudgeUsers> doWork() {
+					return session.createCriteria(JudgeUsers.class).add(Restrictions.eq("loggedIn", 'Y')).list();
+				}
+			}.execute();
+			if (!list.isEmpty()) {
+				map.put("success", true);
+				map.put("object", list);
+			} else {
+				map.put("success", false);
+				map.put("error", "NO USERS FOUND");
+			}
+		} catch (Exception e) {
+			logger.error("Exception occurred while fetching all users. Exception message is " + e.getMessage(), e);
+			map.put("success", false);
+			map.put("error", "Exception occurred while fetching all registered users. Exception message is " + e.getMessage());
 		}
 		return getResponse(new JSONObject(map));
 	}

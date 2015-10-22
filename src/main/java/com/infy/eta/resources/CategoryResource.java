@@ -1,6 +1,6 @@
 package com.infy.eta.resources;
 
-import com.infy.eta.databeans.JudgeCategoriesEntity;
+import com.infy.eta.databeans.JudgeCategories;
 import com.infy.eta.utils.DoInTransaction;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -37,10 +37,10 @@ public class CategoryResource {
 		try {
 			if (category != null && !category.isEmpty()) {
 				logger.info("All parameters are valid. Saving category " + category);
-				JudgeCategoriesEntity entity = new DoInTransaction<JudgeCategoriesEntity>() {
+				JudgeCategories entity = new DoInTransaction<JudgeCategories>() {
 					@Override
-					protected JudgeCategoriesEntity doWork() {
-						JudgeCategoriesEntity entity = new JudgeCategoriesEntity();
+					protected JudgeCategories doWork() {
+						JudgeCategories entity = new JudgeCategories();
 						entity.setDescription(description);
 						entity.setCategory(category);
 						entity.setId(null);
@@ -88,10 +88,10 @@ public class CategoryResource {
 		logger.info("Received get categories request.");
 		HashMap<String, Object> map = new HashMap<>();
 		try {
-			List<JudgeCategoriesEntity> list = new DoInTransaction<List<JudgeCategoriesEntity>>() {
+			List<JudgeCategories> list = new DoInTransaction<List<JudgeCategories>>() {
 				@Override
-				protected List<JudgeCategoriesEntity> doWork() {
-					Criteria criteria = session.createCriteria(JudgeCategoriesEntity.class);
+				protected List<JudgeCategories> doWork() {
+					Criteria criteria = session.createCriteria(JudgeCategories.class);
 					return criteria.list();
 				}
 			}.execute();
@@ -119,11 +119,11 @@ public class CategoryResource {
 	public Response getCategory(@PathParam("id") String id) {
 		HashMap<String, Object> map = new HashMap<>();
 		try {
-			List<JudgeCategoriesEntity> list = new DoInTransaction<List<JudgeCategoriesEntity>>() {
+			List<JudgeCategories> list = new DoInTransaction<List<JudgeCategories>>() {
 				@Override
-				protected List<JudgeCategoriesEntity> doWork() {
+				protected List<JudgeCategories> doWork() {
 					Integer  categoryId = Integer.parseInt(id);
-					Criteria criteria   = session.createCriteria(JudgeCategoriesEntity.class);
+					Criteria criteria = session.createCriteria(JudgeCategories.class);
 					criteria.add(Restrictions.eq("id", categoryId));
 					return criteria.list();
 				}

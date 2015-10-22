@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE hibernate-mapping PUBLIC
         "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 
-    <class name="com.infy.eta.databeans.JudgeProblemsEntity" table="JUDGE_PROBLEMS" schema="JOAMIT">
+    <class name="com.infy.eta.databeans.JudgeProblems" table="JUDGE_PROBLEMS" schema="JOAMIT">
         <id name="id" column="ID">
             <generator class="sequence-identity">
                 <param name="sequence">JUDGE_PROBLEMS_SEQ</param>
@@ -21,21 +21,21 @@
         <property name="addedOn" column="ADDED_ON"/>
         <property name="modifiedOn" column="MODIFIED_ON"/>
         <property name="contestId" column="CONTEST_ID"/>
-        <many-to-one name="judgeContestsByContestId" class="com.infy.eta.databeans.JudgeContestsEntity" insert="false"
-                     update="false">
-            <column name="CONTEST_ID" not-null="true"/>
+        <many-to-one name="judgeContestsByContestId" insert="false" update="false"
+                     class="com.infy.eta.databeans.JudgeContests">
+            <column name="CONTEST_ID"/>
         </many-to-one>
         <set name="judgeTestCasesById" inverse="true">
             <key>
                 <column name="PROBLEM_ID" not-null="true"/>
             </key>
-            <one-to-many not-found="ignore" class="com.infy.eta.databeans.JudgeTestCasesEntity"/>
+            <one-to-many not-found="ignore" class="com.infy.eta.databeans.JudgeTestCases"/>
         </set>
         <set name="judgeUserSolvedProblemsesById" inverse="true">
             <key>
                 <column name="PROBLEM_ID" not-null="true"/>
             </key>
-            <one-to-many not-found="ignore" class="com.infy.eta.databeans.JudgeUserSolvedProblemsEntity"/>
+            <one-to-many not-found="ignore" class="com.infy.eta.databeans.JudgeUserSolvedProblems"/>
         </set>
     </class>
 </hibernate-mapping>

@@ -4,18 +4,18 @@ import java.sql.Timestamp;
 import java.util.Collection;
 
 /**
- * Created by Amit Joshi on 10/19/2015.
+ * Created by Amit Joshi on 10/22/2015.
  */
-public class JudgeContestsEntity {
-	private Integer                         contestId;
-	private String                          contestName;
-	private String                          contestDescription;
-	private String                          contestPrize;
-	private String                          contestOrganizer;
-	private int                             contestDuration;
-	private Timestamp                       inZ;
-	private Timestamp                       outZ;
-	private Collection<JudgeProblemsEntity> judgeProblemsesByContestId;
+public class JudgeContests {
+	private Integer                   contestId;
+	private String                    contestName;
+	private String                    contestDescription;
+	private String                    contestPrize;
+	private String                    contestOrganizer;
+	private Integer                   contestDuration;
+	private Timestamp                 inZ;
+	private Timestamp                 outZ;
+	private Collection<JudgeProblems> judgeProblemsesByContestId;
 
 	public Integer getContestId() {
 		return contestId;
@@ -57,11 +57,11 @@ public class JudgeContestsEntity {
 		this.contestOrganizer = contestOrganizer;
 	}
 
-	public int getContestDuration() {
+	public Integer getContestDuration() {
 		return contestDuration;
 	}
 
-	public void setContestDuration(int contestDuration) {
+	public void setContestDuration(Integer contestDuration) {
 		this.contestDuration = contestDuration;
 	}
 
@@ -83,7 +83,7 @@ public class JudgeContestsEntity {
 
 	@Override
 	public int hashCode() {
-		int result = contestId != null ? contestId.hashCode() : 0;
+		int result = contestId;
 		result = 31 * result + (contestName != null ? contestName.hashCode() : 0);
 		result = 31 * result + (contestDescription != null ? contestDescription.hashCode() : 0);
 		result = 31 * result + (contestPrize != null ? contestPrize.hashCode() : 0);
@@ -99,10 +99,10 @@ public class JudgeContestsEntity {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		JudgeContestsEntity that = (JudgeContestsEntity) o;
+		JudgeContests that = (JudgeContests) o;
 
+		if (contestId != that.contestId) return false;
 		if (contestDuration != that.contestDuration) return false;
-		if (contestId != null ? !contestId.equals(that.contestId) : that.contestId != null) return false;
 		if (contestName != null ? !contestName.equals(that.contestName) : that.contestName != null) return false;
 		if (contestDescription != null ? !contestDescription.equals(that.contestDescription) : that.contestDescription != null)
 			return false;
@@ -115,11 +115,11 @@ public class JudgeContestsEntity {
 		return true;
 	}
 
-	public Collection<JudgeProblemsEntity> getJudgeProblemsesByContestId() {
+	public Collection<JudgeProblems> getJudgeProblemsesByContestId() {
 		return judgeProblemsesByContestId;
 	}
 
-	public void setJudgeProblemsesByContestId(Collection<JudgeProblemsEntity> judgeProblemsesByContestId) {
+	public void setJudgeProblemsesByContestId(Collection<JudgeProblems> judgeProblemsesByContestId) {
 		this.judgeProblemsesByContestId = judgeProblemsesByContestId;
 	}
 }

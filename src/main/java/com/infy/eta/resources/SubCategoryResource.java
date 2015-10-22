@@ -1,6 +1,6 @@
 package com.infy.eta.resources;
 
-import com.infy.eta.databeans.JudgeSubcategoriesEntity;
+import com.infy.eta.databeans.JudgeSubcategories;
 import com.infy.eta.utils.DoInTransaction;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -37,17 +37,17 @@ public class SubCategoryResource {
 		try {
 			if (subCategory != null && !subCategory.isEmpty()) {
 				logger.info("All parameters are valid. Saving sub category.");
-				JudgeSubcategoriesEntity entity = new DoInTransaction<JudgeSubcategoriesEntity>() {
+				JudgeSubcategories entity = new DoInTransaction<JudgeSubcategories>() {
 					@Override
-					protected JudgeSubcategoriesEntity doWork() {
-						JudgeSubcategoriesEntity entity = new JudgeSubcategoriesEntity();
+					protected JudgeSubcategories doWork() {
+						JudgeSubcategories entity = new JudgeSubcategories();
 						entity.setDescription(description);
 						entity.setSubcategory(subCategory);
 						session.saveOrUpdate(entity);
 						return entity;
 					}
 				}.execute();
-				if (entity != null && entity.getId() != null) {
+				if (entity != null && entity.getId() != 0) {
 					logger.info("Save complete with id " + entity.getId());
 					map.put("success", true);
 					map.put("object", entity);
@@ -88,10 +88,10 @@ public class SubCategoryResource {
 		HashMap<String, Object> map = new HashMap<>();
 		try {
 			logger.info("Initializing database access now");
-			List<JudgeSubcategoriesEntity> list = new DoInTransaction<List<JudgeSubcategoriesEntity>>() {
+			List<JudgeSubcategories> list = new DoInTransaction<List<JudgeSubcategories>>() {
 				@Override
-				protected List<JudgeSubcategoriesEntity> doWork() {
-					Criteria criteria = session.createCriteria(JudgeSubcategoriesEntity.class);
+				protected List<JudgeSubcategories> doWork() {
+					Criteria criteria = session.createCriteria(JudgeSubcategories.class);
 					return criteria.list();
 				}
 			}.execute();
@@ -120,10 +120,10 @@ public class SubCategoryResource {
 		HashMap<String, Object> map = new HashMap<>();
 		try {
 			Integer subCategoryId = Integer.parseInt(id);
-			List<JudgeSubcategoriesEntity> list = new DoInTransaction<List<JudgeSubcategoriesEntity>>() {
+			List<JudgeSubcategories> list = new DoInTransaction<List<JudgeSubcategories>>() {
 				@Override
-				protected List<JudgeSubcategoriesEntity> doWork() {
-					Criteria criteria = session.createCriteria(JudgeSubcategoriesEntity.class);
+				protected List<JudgeSubcategories> doWork() {
+					Criteria criteria = session.createCriteria(JudgeSubcategories.class);
 					criteria.add(Restrictions.eq("id", subCategoryId));
 					return criteria.list();
 				}

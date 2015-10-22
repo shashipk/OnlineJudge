@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE hibernate-mapping PUBLIC
         "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 
-    <class name="com.infy.eta.databeans.JudgeTestCasesEntity" table="JUDGE_TEST_CASES" schema="JOAMIT">
+    <class name="com.infy.eta.databeans.JudgeTestCases" table="JUDGE_TEST_CASES" schema="JOAMIT">
         <id name="id" column="ID">
             <generator class="sequence-identity">
                 <param name="sequence">JUDGE_TEST_CASES_SEQ</param>
@@ -15,8 +15,8 @@
         <property name="input" column="INPUT"/>
         <property name="output" column="OUTPUT"/>
         <property name="points" column="POINTS"/>
-        <many-to-one name="judgeProblemsByProblemId" class="com.infy.eta.databeans.JudgeProblemsEntity" insert="false"
-                     update="false">
+        <many-to-one name="judgeProblemsByProblemId" insert="false" update="false"
+                     class="com.infy.eta.databeans.JudgeProblems">
             <column name="PROBLEM_ID" not-null="true"/>
         </many-to-one>
     </class>

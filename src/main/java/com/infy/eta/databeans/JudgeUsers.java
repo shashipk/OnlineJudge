@@ -3,9 +3,9 @@ package com.infy.eta.databeans;
 import java.sql.Timestamp;
 
 /**
- * Created by Amit Joshi on 10/19/2015.
+ * Created by Amit Joshi on 10/22/2015.
  */
-public class JudgeUsersEntity {
+public class JudgeUsers {
 	private Integer id;
 	private String username;
 	private String password;
@@ -14,7 +14,7 @@ public class JudgeUsersEntity {
 	private String role;
 	private Timestamp inZ;
 	private Timestamp outZ;
-	private String loggedIn;
+	private Character loggedIn;
 
 	public Integer getId() {
 		return id;
@@ -80,17 +80,17 @@ public class JudgeUsersEntity {
 		this.outZ = outZ;
 	}
 
-	public String getLoggedIn() {
+	public Character getLoggedIn() {
 		return loggedIn;
 	}
 
-	public void setLoggedIn(String loggedIn) {
+	public void setLoggedIn(Character loggedIn) {
 		this.loggedIn = loggedIn;
 	}
 
 	@Override
 	public int hashCode() {
-		int result = id != null ? id.hashCode() : 0;
+		int result = id;
 		result = 31 * result + (username != null ? username.hashCode() : 0);
 		result = 31 * result + (password != null ? password.hashCode() : 0);
 		result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
@@ -107,9 +107,9 @@ public class JudgeUsersEntity {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		JudgeUsersEntity that = (JudgeUsersEntity) o;
+		JudgeUsers that = (JudgeUsers) o;
 
-		if (id != null ? !id.equals(that.id) : that.id != null) return false;
+		if (id != that.id) return false;
 		if (username != null ? !username.equals(that.username) : that.username != null) return false;
 		if (password != null ? !password.equals(that.password) : that.password != null) return false;
 		if (firstName != null ? !firstName.equals(that.firstName) : that.firstName != null) return false;

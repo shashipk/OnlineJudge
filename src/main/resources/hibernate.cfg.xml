@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE hibernate-configuration PUBLIC
         "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
         <property name="connection.url">jdbc:oracle:thin:@//localhost:1521/xe</property>
@@ -13,17 +13,15 @@
 
         <property name="show_sql">false</property>
         <property name="current_session_context_class">thread</property>
-        <property name="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</property>
-        <property name="hibernate.cache.use_query_cache">true</property>
-        <property name="hibernate.cache.use_second_level_cache">true</property>
         <property name="bytecode.use_reflection_optimizer">true</property>
+        <property name="hibernate.jdbc.use_get_generated_keys">true</property>
 
-        <mapping resource="JudgeCategoriesEntity.hbm.xml"/>
-        <mapping resource="JudgeContestsEntity.hbm.xml"/>
-        <mapping resource="JudgeProblemsEntity.hbm.xml"/>
-        <mapping resource="JudgeSubcategoriesEntity.hbm.xml"/>
-        <mapping resource="JudgeTestCasesEntity.hbm.xml"/>
-        <mapping resource="JudgeUsersEntity.hbm.xml"/>
-        <mapping resource="JudgeUserSolvedProblemsEntity.hbm.xml"/>
+        <mapping resource="JudgeCategories.hbm.xml"/>
+        <mapping resource="JudgeContests.hbm.xml"/>
+        <mapping resource="JudgeProblems.hbm.xml"/>
+        <mapping resource="JudgeSubcategories.hbm.xml"/>
+        <mapping resource="JudgeTestCases.hbm.xml"/>
+        <mapping resource="JudgeUsers.hbm.xml"/>
+        <mapping resource="JudgeUserSolvedProblems.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>

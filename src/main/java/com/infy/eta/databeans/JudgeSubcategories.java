@@ -1,12 +1,11 @@
 package com.infy.eta.databeans;
 
-
 /**
- * Created by Amit Joshi on 10/19/2015.
+ * Created by Amit Joshi on 10/22/2015.
  */
-public class JudgeCategoriesEntity {
+public class JudgeSubcategories {
 	private Integer id;
-	private String category;
+	private String subcategory;
 	private String description;
 
 	public Integer getId() {
@@ -17,12 +16,12 @@ public class JudgeCategoriesEntity {
 		this.id = id;
 	}
 
-	public String getCategory() {
-		return category;
+	public String getSubcategory() {
+		return subcategory;
 	}
 
-	public void setCategory(String category) {
-		this.category = category;
+	public void setSubcategory(String subcategory) {
+		this.subcategory = subcategory;
 	}
 
 	public String getDescription() {
@@ -35,8 +34,8 @@ public class JudgeCategoriesEntity {
 
 	@Override
 	public int hashCode() {
-		int result = id != null ? id.hashCode() : 0;
-		result = 31 * result + (category != null ? category.hashCode() : 0);
+		int result = id;
+		result = 31 * result + (subcategory != null ? subcategory.hashCode() : 0);
 		result = 31 * result + (description != null ? description.hashCode() : 0);
 		return result;
 	}
@@ -46,10 +45,10 @@ public class JudgeCategoriesEntity {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		JudgeCategoriesEntity that = (JudgeCategoriesEntity) o;
+		JudgeSubcategories that = (JudgeSubcategories) o;
 
-		if (id != null ? !id.equals(that.id) : that.id != null) return false;
-		if (category != null ? !category.equals(that.category) : that.category != null) return false;
+		if (id != that.id) return false;
+		if (subcategory != null ? !subcategory.equals(that.subcategory) : that.subcategory != null) return false;
 		if (description != null ? !description.equals(that.description) : that.description != null) return false;
 
 		return true;
